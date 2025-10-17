@@ -1,7 +1,8 @@
 import socket
 import os
 
-SERVER_IP = "127.0.0.1"
+# SERVER_IP = "127.0.0.1"    # LOCALHOST
+SERVER_IP = "192.168.17.162" # Raspberry IP on LAB_DIG network.
 PORT = 5000
 
 def main():

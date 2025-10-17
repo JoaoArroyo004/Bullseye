@@ -1,0 +1,18 @@
+[project]
+name = "bullseye"
+version = "0.1.0"
+description = "Embedded systems project that uses a Rpi3B as its micro-controller and identifies and track human targets specified via mobile application"
+authors = [
+    {name = "JoaoArroyo004",email = "comp.arroyo@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gpiozero (>=2.0.1,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
