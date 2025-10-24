@@ -17,11 +17,11 @@ current_angle = 45  # posição inicial (meio)
 FRAME_WIDTH = 640
 CENTER_X = FRAME_WIDTH // 2
 DEAD_ZONE = 20  # pixels de tolerância
-MAX_ANGLE = 90
+MAX_ANGLE = 120
 MIN_ANGLE = 0
 
 def set_angle(angle):
-    """Move o servo para o ângulo especificado (0 a 90°)."""
+    """Move o servo para o ângulo especificado (0 a 120°)."""
     global current_angle
     angle = max(MIN_ANGLE, min(MAX_ANGLE, angle))
     duty = 2 + (angle / 18)  # duty cycle típico
