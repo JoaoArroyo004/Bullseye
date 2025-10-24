@@ -1,10 +1,10 @@
 import threading
 import time
 
-from Source.Services.Server.server import server_handler
-from Source.Services.Camera.camera_handler import camera_handler
-from Source.Services.Servo.servo_handler import servo_handler
-from Source.Services.Shared.shared_data import shared_data, data_lock
+from Services.Server.server import server_handler
+from Services.Camera.camera_handler import camera_handler
+from Services.Servo.servo_handler import servo_handler
+from Services.Shared.shared_data import shared_data, data_lock
 
 functions = [
     lambda: camera_handler(shared_data, data_lock),

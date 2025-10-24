@@ -1,5 +1,5 @@
 import cv2
-from Source.Services.Camera.camera_stream import MJPEGStreamer
+from Services.Camera.camera_stream import MJPEGStreamer
 
 FRAME_WIDTH = 640
 
