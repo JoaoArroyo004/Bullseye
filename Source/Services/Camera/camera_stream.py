@@ -47,7 +47,7 @@ class MJPEGStreamer:
         buffer = b''
 
         while self.running and self.process.poll() is None:
-            data = self.process.stdout.read(4096)
+            data = self.process.stdout.read(65536)
             if not data:
                 time.sleep(0.01)
                 continue
@@ -70,6 +70,14 @@ class MJPEGStreamer:
                 if frame is not None:
                     if not self.frame_queue.full():
                         self.frame_queue.put(frame)
+                    else:
+                        # descarta o frame mais antigo
+                        try:
+                            self.frame_queue.get_nowait()
+                        except:
+                            pass
+                        self.frame_queue.put(frame)
+
 
     def get_frame(self, timeout=0.1):
         """Retorna o frame mais recente, ou None se não houver"""
