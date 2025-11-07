@@ -48,6 +48,9 @@ def servo_handler(shared_data=None, data_lock=None):
                     target_x = shared_data.get("target_x", None)
                     face_count = shared_data.get("target_count", 0)
 
+                if target_x is None:
+                    time.sleep(0.1)
+                    continue
                 if face_count > 0 and target_x is not None:
                     error = target_x - CENTER_X
 

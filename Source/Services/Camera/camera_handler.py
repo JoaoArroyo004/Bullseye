@@ -58,6 +58,7 @@ def camera_handler(shared_data, data_lock):
     CENTER_X = FRAME_WIDTH // 2
     frame_count = 0
     start_time = time.time()
+    target_name = shared_data.get("main_target", None)
 
     try:
         while True:
@@ -67,30 +68,53 @@ def camera_handler(shared_data, data_lock):
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-
             if len(faces) > 0:
-                (x, y, w, h) = faces[0]
-                center_x = x + w // 2
+                recognized_faces = []
+                target_found = False
+                target_x = None
 
-                # Atualiza posição do rosto no shared_data
+                for (x, y, w, h) in faces:
+                    face_roi = gray[y:y + h, x:x + w]
+                    label_text = "Unknown"
+                    confidence = 999
+
+                    # Reconhece o rosto (se modelo disponível)
+                    if recognizer is not None:
+                        label, confidence = recognizer.predict(face_roi)
+                        if confidence < 80:
+                            label_text = name_map.get(label, "Unknown")
+
+                    # Guarda o resultado
+                    recognized_faces.append((x, y, w, h, label_text, confidence))
+
+                # Verifica se algum rosto corresponde ao(s) target(s)
                 with data_lock:
-                    shared_data["target_x"] = center_x
-                    shared_data["target_count"] = len(faces)
+                    targets = shared_data.get("current_targets", [])
 
-                # Reconhecimento facial (se disponível)
-                face_roi = gray[y:y + h, x:x + w]
-                label_text = "Unknown"
+                for (x, y, w, h, label_text, confidence) in recognized_faces:
+                    if label_text == target_name:
+                        center_x = x + w // 2
+                        target_x = center_x
+                        target_found = True
+                        break  # só o primeiro alvo encontrado
 
-                if recognizer is not None:
-                    label, confidence = recognizer.predict(face_roi)
-                    if confidence < 50:
-                        label_text = name_map.get(label, "Unknown")
-                    print(f"[FACE] {label_text} ({confidence:.1f})")
+                # Atualiza shared_data
+                with data_lock:
+                    if target_found:
+                        shared_data["target_x"] = target_x
+                        shared_data["target_count"] = len(faces)
+                    else:
+                        # Nenhum alvo válido encontrado
+                        shared_data["target_x"] = None
+                        shared_data["target_count"] = len(faces)
 
-                # Desenhar bounding box e nome
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-                cv2.putText(frame, label_text, (x, y - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+                # Desenhar as detecções na tela
+                for (x, y, w, h, label_text, confidence) in recognized_faces:
+                    color = (0, 255, 0) if label_text == target_name else (0, 0, 255)
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+                    cv2.putText(frame, f"{label_text} ({confidence:.1f})", (x, y - 10),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+
 
             # FPS display
             frame_count += 1
@@ -101,6 +125,10 @@ def camera_handler(shared_data, data_lock):
                 start_time = time.time()
                 cv2.putText(frame, f"FPS: {fps:.1f}", (10, 30),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                
+            if target_name:
+                cv2.putText(frame, f"Target: {target_name}", (10, 60),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
 
             cv2.imshow("Face Tracking", frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):

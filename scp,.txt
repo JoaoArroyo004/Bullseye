@@ -1,1 +1,1 @@
-scp -r C:\Users\MurilloFreitasdaSilv\coding\Bullseye\Source\Services\Servo embarcados@192.168.17.162:~/Documentos/sv
+scp -r C:\Users\MurilloFreitasdaSilv\coding\Bullseye\Source\Services\Camera\camera_handler.py embarcados@192.168.17.162:~/Documentos/main/Source/Services/Camera
