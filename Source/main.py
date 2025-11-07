@@ -1,15 +1,11 @@
+from Source.Services.Server.server import server_handler
+import os
+import sys
 import threading
 import time
 
-from Source.Services.Server.server import server_handler
-
-shared_data = {
-    "operation_mode": 0, # [sleep, multiple, single]
-    "target_count": 0,
-    "identifiable_targets": ["Aa", "Bb", "Arnaldo", "Beraldo", "Cernaldo"],
-    "current_targets": ["Aa", "Bb"]
-}
-data_lock = threading.Lock() # Lock/Unlock (Semaphore)
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
 
 functions = [
     lambda: camera_handler(),
@@ -21,15 +17,15 @@ functions = [
 def camera_handler():
     while True:
         with data_lock:
-            shared_data["counter"] += 1
-            print(f"[camera_handler] Counter: {shared_data['counter']}")
+            system_state["counter"] += 1
+            print(f"[camera_handler] Counter: {system_state['counter']}")
         time.sleep(1)
 
 def servo_handler():
     while True:
         with data_lock:
-            shared_data["message"] = f"Message updated by servo_handler at {time.time()}"
-            print(f"[servo_handler] {shared_data['message']}")
+            system_state["message"] = f"Message updated by servo_handler at {time.time()}"
+            print(f"[servo_handler] {system_state['message']}")
         time.sleep(2)
 
 threads = []

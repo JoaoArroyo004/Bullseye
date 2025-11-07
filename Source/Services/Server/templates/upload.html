@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Target Image</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        form { margin-top: 20px; }
+        input, select, button { margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Upload Target Image</h1>
+
+    <p>Current mode: <b>{{ mode }}</b></p>
+    <a href="{{ url_for('index') }}">← Back to main page</a>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label for="target_name">Select target:</label>
+        <select name="target_name" id="target_name" required>
+            <option value="">-- Select target --</option>
+            {% for target in targets %}
+                <option value="{{ target }}">{{ target }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="file">Select image:</label>
+        <input type="file" name="file" id="file" accept="image/*" required><br>
+
+        <button type="submit">Upload</button>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul style="color: green;">
+            {% for msg in messages %}
+                <li>{{ msg }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</body>
+</html>
