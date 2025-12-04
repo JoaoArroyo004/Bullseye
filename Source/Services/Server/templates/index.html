@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Control Panel</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        button { margin: 5px; padding: 10px 15px; }
+    </style>
+</head>
+<body>
+    <h1>System Control</h1>
+    <p>Current mode: <b>{{ mode }}</b></p>
+    <p>Active targets: {{ targets }}</p>
+
+    <form id="modeForm" method="POST" action="/set_mode">
+        <label>Select Mode:</label><br>
+        <button type="submit" name="mode" value="sleep">Sleep</button>
+        <button type="submit" name="mode" value="single">Single</button>
+        <button type="submit" name="mode" value="multiple">Multiple</button>
+    </form>
+
+    {% if mode != "sleep" %}
+        <br>
+        <a href="{{ url_for('upload_page') }}">
+            <button type="button">Upload Target Image</button>
+        </a>
+    {% endif %}
+</body>
+</html>
