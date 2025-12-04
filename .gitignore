@@ -2,3 +2,4 @@
 /playground/file_transfer/**/*.txt
 /cheatsheet.md
 /scp,.txt
+/Source/Services/Server/uploads/**/*
