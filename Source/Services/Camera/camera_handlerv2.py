@@ -118,7 +118,7 @@ def camera_handler(shared_data, data_lock):
                 label, pred_confidence = recognizer.predict(roi)
                 label_text = name_map.get(label, "Unknown")
                 confidence = pred_confidence
-                if pred_confidence < 50:  # Limite maior
+                if pred_confidence < 60:  # Limite maior
                     is_recognized = True
                 else:
                     label_text = "Unknown"  # Marcar com
