@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upload Target Image</title>
+    <title>Upload Target Images</title>
     <style>
         body { font-family: Arial; margin: 40px; }
         form { margin-top: 20px; }
@@ -9,7 +9,7 @@
     </style>
 </head>
 <body>
-    <h1>Upload Target Image</h1>
+    <h1>Upload Target Images</h1>
 
     <p>Current mode: <b>{{ mode }}</b></p>
     <a href="{{ url_for('index') }}">← Back to main page</a>
@@ -23,10 +23,15 @@
             {% endfor %}
         </select><br>
 
-        <label for="file">Select image:</label>
-        <input type="file" name="file" id="file" accept="image/*" required><br>
+        <label for="files">Select images:</label>
+        <input type="file" name="files" id="files" accept="image/*" multiple required><br>
 
-        <button type="submit">Upload</button>
+        <!-- Usa o componente ModeButton -->
+        <mode-button 
+            label="Upload"
+            mode="upload"
+            current_mode="{{ mode }}">
+        </mode-button>
     </form>
 
     {% with messages = get_flashed_messages() %}
@@ -38,5 +43,38 @@
             </ul>
         {% endif %}
     {% endwith %}
+
+    <!-- Importa o componente -->
+    <script type="module">
+        class ModeButton extends HTMLElement {
+            connectedCallback() {
+                const label = this.getAttribute("label") || "";
+                const mode = this.getAttribute("mode") || "";
+                const current = this.getAttribute("current_mode") || "";
+
+                const isActive = mode === current;
+
+                this.innerHTML = `
+                    <button
+                        type="submit"
+                        style="
+                            padding: 10px 18px;
+                            font-size: 16px;
+                            border-radius: 6px;
+                            border: none;
+                            cursor: pointer;
+                            background-color: ${isActive ? '#4CAF50' : '#ddd'};
+                            color: ${isActive ? 'white' : 'black'};
+                        "
+                    >
+                        ${label}
+                    </button>
+                `;
+            }
+        }
+
+        customElements.define("mode-button", ModeButton);
+    </script>
+
 </body>
 </html>

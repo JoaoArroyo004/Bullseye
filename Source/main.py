@@ -5,15 +5,15 @@ import sys
 # Importações dos seus serviços
 from Services.Server.server import server_handler
 from Services.Camera.camera_handlerv2 import camera_handler
-from Services.Servo.servo_handler_pi5 import servo_handler
+# from Services.Servo.servo_handler_pi5 import servo_handler
 from Services.Shared.shared_data import shared_data, data_lock
 
 def main():
     print("[SYSTEM] Inicializando Threads de Background...")
 
     # 1. Iniciar Servo em Thread (Daemon para morrer quando o app fechar)
-    t_servo = threading.Thread(target=servo_handler, args=(shared_data, data_lock), daemon=True)
-    t_servo.start()
+    # t_servo = threading.Thread(target=servo_handler, args=(shared_data, data_lock), daemon=True)
+    # t_servo.start()
 
     # 2. Iniciar Server em Thread
     t_server = threading.Thread(target=server_handler, daemon=True)
@@ -25,7 +25,7 @@ def main():
     print("[SYSTEM] Iniciando Câmera na MAIN THREAD (Obrigatório para OpenCV GUI)...")
     
     try:
-        # 3. A Câmera roda BLOQUEANDO a main thread. 
+        # Thread principal roda a caemra
         # Isso resolve o problema de travamento da janela/buffer.
         camera_handler(shared_data, data_lock)
         

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Remove Target</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        form { margin-top: 20px; }
+        input, select, button { margin: 5px; padding: 8px; }
+        button {
+            background: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #c9302c;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Remove Target</h2>
+
+<a href="{{ url_for('index') }}">← Back to main page</a>
+
+<form method="POST">
+    <label>Select target to delete:</label><br>
+    <select name="target_name" required>
+        <option value="">-- Select target --</option>
+        {% for t in targets %}
+            <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <button type="submit">Delete Target</button>
+</form>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul style="color: green;">
+        {% for msg in messages %}
+            <li>{{ msg }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+</body>
+</html>

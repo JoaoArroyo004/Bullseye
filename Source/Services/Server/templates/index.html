@@ -1,29 +1,180 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8" />
     <title>System Control Panel</title>
+
+    <!-- Componente Jinja para botão -->
+    {% macro mode_button(label, value, current_mode) %}
+        <button type="submit" name="mode" value="{{ value }}"
+            class="btn-mode {{ 'active' if value == current_mode else 'inactive' }}">
+            {{ label }}
+        </button>
+    {% endmacro %}
+
     <style>
-        body { font-family: Arial; margin: 40px; }
-        button { margin: 5px; padding: 10px 15px; }
+        :root{
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --accent: #2563eb;
+            --green: #008000;
+            --muted: #6b7280;
+            --radius: 10px;
+        }
+
+        body {
+            font-family: Inter, Arial, sans-serif;
+            margin: 24px;
+            background: var(--bg);
+            color: #111827;
+        }
+
+        header h1 { margin: 0 0 12px 0; font-size: 1.5rem; }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .panel {
+            background: var(--card);
+            padding: 18px;
+            border-radius: var(--radius);
+            box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+        }
+
+        .left { flex: 1 1 60%; }
+        .right { flex: 0 0 34%; }
+
+        .controls .mode { margin-bottom: 12px; }
+        .mode b { color: var(--green); }
+
+        /* Novo estilo unificado para botões de modo */
+        .btn-mode {
+            margin: 6px 6px 6px 0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+        }
+
+        .btn-mode.active { background: var(--green); }
+        .btn-mode.inactive { background: var(--accent); }
+        .btn-mode:active { transform: translateY(1px); }
+
+        .actions {
+            margin-top: 12px;
+        }
+        .actions a { text-decoration: none; }
+        .actions .btn {
+            display: inline-block;
+            margin-right: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #111827;
+            color: white;
+            font-weight: 600;
+        }
+
+        h2 { margin-top: 0; font-size: 1.05rem; }
+
+        .stat {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        ul.targets {
+            margin: 8px 0 0 18px;
+            padding: 0;
+        }
+
+        ul.targets li {
+            margin: 6px 0;
+            list-style-type: disc;
+        }
+
+        @media (max-width: 820px) {
+            .container { flex-direction: column; }
+            .right { flex-basis: auto; }
+        }
     </style>
 </head>
 <body>
-    <h1>System Control</h1>
-    <p>Current mode: <b>{{ mode }}</b></p>
-    <p>Active targets: {{ targets }}</p>
+    <header>
+        <h1>System Control Panel</h1>
+    </header>
 
-    <form id="modeForm" method="POST" action="/set_mode">
-        <label>Select Mode:</label><br>
-        <button type="submit" name="mode" value="sleep">Sleep</button>
-        <button type="submit" name="mode" value="single">Single</button>
-        <button type="submit" name="mode" value="multiple">Multiple</button>
-    </form>
+    <div class="container">
 
-    {% if mode != "sleep" %}
-        <br>
-        <a href="{{ url_for('upload_page') }}">
-            <button type="button">Upload Target Image</button>
-        </a>
-    {% endif %}
+        <!-- Painel de controle -->
+        <div class="panel left controls">
+            <h2>Controls</h2>
+
+            <p class="mode">Current mode: <b>{{ mode }}</b></p>
+
+            <form id="modeForm" method="POST" action="/set_mode">
+                <label class="stat"><strong>Select Mode</strong></label><br>
+
+                {{ mode_button("Sleep", "sleep", mode) }}
+                {{ mode_button("Single", "single", mode) }}
+                {{ mode_button("Multiple", "multiple", mode) }}
+                {{ mode_button("Training", "training", mode) }}
+            </form>
+
+            {% if mode != "sleep" %}
+            <div class="actions">
+                <a class="btn" href="{{ url_for('upload_page') }}">Upload Target Image</a>
+                {%if mode == "training" %}
+                    <a class="btn" href="{{ url_for('model_training') }}">Model Training</a>
+                {% endif %}
+
+                <a class="btn" href="{{ url_for('remove_target') }}">Remove Target</a>
+
+                {% if mode == "single" %}                
+                    <a class="btn" href="{{ url_for('add_single_target') }}">Set new single target</a>                
+                {% elif mode == "multiple" %}
+                    <a class="btn" href="{{ url_for('multiple_add_target') }}">Add Target</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Painel da direita -->
+        <div class="panel right">
+            <h2>Search Status</h2>
+
+            {% if mode != "sleep" %}
+                {% if mode == "multiple" %}            
+                    <p class="stat"><strong>Total tracked targets:</strong> {{ targets|length }}</p>
+                {% else %}
+                    <p class="stat"><strong>Total tracked targets:</strong> {{ 1 if single_target else 0 }}</p>
+                {% endif %}
+                
+                {% if mode == "multiple" and targets %}
+                    <p class="stat"><strong>Targets:</strong></p>
+                    <ul class="targets">
+                        {% for t in targets %}
+                            <li>{{ t }}</li>
+                        {% endfor %}
+                    </ul>
+                {% elif mode == "single" and single_target %}
+                    <p class="stat"><strong>Target:</strong></p>
+                        <ul class="targets">                            
+                            <li>{{ single_target }}</li>                            
+                        </ul>
+                {% else %}
+                    <p class="stat">No targets identified yet.</p>
+                {% endif %}
+
+            {% else %}
+                <p class="stat">Search info will appear here when mode is set to <strong>single</strong> or <strong>multiple</strong>.</p>
+            {% endif %}
+        </div>
+
+    </div>
 </body>
 </html>
